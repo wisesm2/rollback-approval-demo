@@ -1,0 +1,40 @@
+name: Rollback SSR Template (demo)
+
+on:
+  workflow_dispatch:
+    inputs:
+      bad_version:
+        description: 'Release to roll back, e.g. v0.0.24'
+        type: string
+        required: true
+      reason:
+        description: 'Why this release is rolled back'
+        type: string
+        required: true
+
+permissions: {}
+
+jobs:
+  plan:
+    name: Plan (dry run)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Plan rollback
+        run: |
+          {
+            echo "## SSR template rollback (dry run)"
+            echo
+            echo "### Rolled back ${{ inputs.bad_version }} -> v0.0.24"
+            echo
+            echo "- Reason: ${{ inputs.reason }}"
+            echo "- Stopped canary experiment 1234"
+            echo "- Set \`ssr_v1_template_version\` stable rule: ${{ inputs.bad_version }} -> v0.0.24"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  rollback:
+    name: Roll back
+    needs: plan
+    runs-on: ubuntu-latest
+    environment: ssr-rollback
+    steps:
+      - run: echo "Demo only. Nothing is changed."
